@@ -6,6 +6,9 @@ import { CheckAdminUserDto } from './dtos/checck-admin-user.dto';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { Admin, AdminDocument } from './schemas/admin.schema';
 import { User, UserDocument } from './schemas/user.schema';
+import { LoginUserDto } from './dtos/login-user.dto';
+import { HttpStatus } from '@nestjs/common';
+import { HttpException } from '@nestjs/common';
 
 @Injectable()
 export class UserService {
@@ -19,6 +22,21 @@ export class UserService {
     const createdAdmin = new this.adminModel({user: createdUser});
     createdUser.save();
     createdAdmin.save();
+  }
+
+  async login(loginUserDto: LoginUserDto) {
+    const userExists = await this.userModel.exists({ email: loginUserDto.email });
+    if (!userExists) {
+      throw new HttpException('Login invalid', HttpStatus.UNAUTHORIZED);
+    }
+
+    const user = await this.userModel.findOne({ email: loginUserDto.email }).exec();
+    if (user.password !== loginUserDto.password) {
+      throw new HttpException('Password invalid', HttpStatus.UNAUTHORIZED);
+    }
+
+    // ...
+    return { statusCode: 200, message: "ey....." };
   }
 
   async isUserAdmin(checkAdminUserDto: CheckAdminUserDto): Promise<Admin> {

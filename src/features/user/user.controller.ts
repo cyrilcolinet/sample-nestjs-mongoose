@@ -4,14 +4,20 @@ import { CreateUserDto } from './dtos/create-user.dto';
 import { User } from './schemas/user.schema';
 import { Param } from '@nestjs/common';
 import { Admin } from './schemas/admin.schema';
+import { LoginUserDto } from './dtos/login-user.dto';
 
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  async create(@Body() createCatDto: CreateUserDto) {
+  async register(@Body() createCatDto: CreateUserDto) {
     await this.userService.create(createCatDto);
+  }
+
+  @Post('/login')
+  async login(@Body() loginUserDto: LoginUserDto) {
+    return this.userService.login(loginUserDto);
   }
 
   @Get()
